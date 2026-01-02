@@ -1,6 +1,7 @@
 const { Usuario, Endereco } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const os = require("os");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
@@ -395,8 +396,15 @@ exports.changePasswordMe = async (req, res) => {
 };
 
 // Configuração de upload para avatar (ficheiros em public/uploads/avatars)
-const avatarDir = path.join(__dirname, "..", "public", "uploads", "avatars");
-fs.mkdirSync(avatarDir, { recursive: true });
+let avatarDir = path.join(__dirname, "..", "public", "uploads", "avatars");
+try {
+  fs.mkdirSync(avatarDir, { recursive: true });
+} catch (_) {
+  avatarDir = path.join(os.tmpdir(), "kwanza-manipulus", "uploads", "avatars");
+  try {
+    fs.mkdirSync(avatarDir, { recursive: true });
+  } catch (_) {}
+}
 
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, avatarDir),

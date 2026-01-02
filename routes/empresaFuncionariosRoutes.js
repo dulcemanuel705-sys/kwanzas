@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const multer = require('multer');
 const router = express.Router();
@@ -8,8 +9,15 @@ const authRole = require('../middlewares/authRole');
 const db = require('../models');
 
 // uploads dir
-const uploadDir = path.join(__dirname, '..', 'public', 'uploads', 'funcionarios');
-fs.mkdirSync(uploadDir, { recursive: true });
+let uploadDir = path.join(__dirname, '..', 'public', 'uploads', 'funcionarios');
+try {
+  fs.mkdirSync(uploadDir, { recursive: true });
+} catch (_) {
+  uploadDir = path.join(os.tmpdir(), 'kwanza-manipulus', 'uploads', 'funcionarios');
+  try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  } catch (_) {}
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
